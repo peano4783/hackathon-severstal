@@ -6,6 +6,7 @@ pip install holoviews
 pip install Flask-Celery
 pip install catboost
 pip install gunicorn
+pip install levenshtein
 """
 import pandas as pd
 from flask import Flask, render_template, flash, request, redirect, url_for
@@ -73,6 +74,7 @@ def result_page():
                            job_id=job_id)
     with open(json_filename) as f:
         result = json.load(f)
+
     return render_template('job_result.html',
                         bokeh_version=bokeh.__version__,
                         title=TITLE,
@@ -108,7 +110,7 @@ def index_page():
             return redirect(request.url)
 
         # Run function that does the actual job:
-        job_id = 'job' + datetime.now().strftime("%Y.%m.%d_%H:%M:%S")
+        job_id = secure_filename('_'.join(['job', datetime.now().strftime("%Y.%m.%d_%H:%M:%S")]))
         ctask.run(job_id, csv_filename, exhauster, agregat)
 
         return redirect(url_for('result_page', job_id=job_id))
