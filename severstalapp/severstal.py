@@ -15,35 +15,37 @@ from werkzeug.utils import secure_filename
 from inference import run_inference
 from celery import Celery, shared_task
 import bokeh
-from time import sleep
+import json
+from datetime import datetime
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'media')
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 app.config['CELERY']=dict(
-        broker_url='amqp://?????:???????????@31.13.134.173:5672/my_vhost',
+        broker_url='amqp://admin:yjdikoadmin@31.13.134.173:5672/my_vhost',
         # result_backend='',
         task_ignore_result=True,
     )
-# app.config.from_prefixed_env()
 
 celery_app = Celery(app.name)
 celery_app.config_from_object(app.config)
 app.extensions["celery"] = celery_app
 
+TITLE = 'Модель раннего обнаружения неисправностей промышленного оборудования'
 
-# @shared_task
 @celery_app.task
-def ctask(job_id):
-    sleep(5)
-    with open('jobs/my_job.json','w') as f:
-        f.write('Hello')
-    return 42
+def ctask(job_id, csv_filename, exhauster, agregat):
+    result = run_inference(job_id, csv_filename, exhauster, agregat)
+    with open(get_job_filename(job_id), 'w', encoding='utf8') as f:
+        json.dump(result, f, ensure_ascii=False)
+    return None
 
-def validate_input_csv(filename):
+def get_job_filename(job_id):
+    return os.path.join(basedir, 'jobs', job_id+'.json')
+def validate_input_csv(csv_filename):
     try:
-        df = pd.read_csv(filename)
+        df = pd.read_csv(csv_filename, nrows=2) # Just read the very beginning of the file
     except:
         return 'Не удается прочитать csv-файл'
     columns = [
@@ -58,6 +60,25 @@ def validate_input_csv(filename):
         if col1 != col2:
             return f"В csv-файле название колонки: {col1}; требуется: {col2}"
     return None
+
+@app.route('/result', methods=['GET', 'POST'])
+def result_page():
+    if not ('job_id' in request.args):
+        return redirect(url_for('index_page'))
+    job_id = request.args.get('job_id')
+    json_filename = get_job_filename(job_id)
+    if not os.path.isfile(json_filename):
+        return render_template('job_pending.html',
+                           title=TITLE,
+                           job_id=job_id)
+    with open(json_filename) as f:
+        result = json.load(f)
+    return render_template('job_result.html',
+                        bokeh_version=bokeh.__version__,
+                        title=TITLE,
+                        job_id=job_id,
+                        result=result)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index_page():
@@ -79,23 +100,25 @@ def index_page():
         if agregat.strip() == '':
            flash('Агрегат не указан')
            return redirect(request.url)
-        xlsx_filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
-        file.save(xlsx_filename)
-        validation_result = validate_input_csv(xlsx_filename)
+        csv_filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
+        file.save(csv_filename)
+        validation_result = validate_input_csv(csv_filename)
         if validation_result:
             flash(validation_result)
             return redirect(request.url)
 
         # Run function that does the actual job:
-        ctask.run(12)
-        # result = run_inference(xlsx_filename, agregat)
+        job_id = 'job' + datetime.now().strftime("%Y.%m.%d_%H:%M:%S")
+        ctask.run(job_id, csv_filename, exhauster, agregat)
+
+        return redirect(url_for('result_page', job_id=job_id))
 
     return render_template('severstal.html',
-                           title='Модель раннего обнаружения неисправностей промышленного оборудования',
+                           title=TITLE,
                            bokeh_version=bokeh.__version__,
                            exhauster=exhauster, agregat=agregat)
 
 if __name__ == '__main__':
     # app.run(debug=False, host="31.13.134.173", port=5678)
-    app.run(debug=False, port=5678)
+    app.run(debug=True, port=5678)
 

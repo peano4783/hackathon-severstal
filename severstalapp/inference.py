@@ -4,12 +4,14 @@ import bokeh
 import holoviews as hv
 hv.extension('bokeh')
 
+from time import sleep
+
 PLOT_WIDTH, PLOT_HEIGHT = 600, 300
 
 
-def run_inference(xlsx_filename, agregat):
+def run_inference(job_id, csv_filename, exhauster, agregat):
     """Вынес сюда "настоящий" код"""
-    xlsx_df = pd.read_excel(xlsx_filename)
+    xlsx_df = pd.read_csv(csv_filename)
     # Now we may work with the uploaded Excel file as a dataframe
     print(xlsx_df.head(10))  # This makes no sense, but still
 
@@ -25,6 +27,8 @@ def run_inference(xlsx_filename, agregat):
 
     # table_attributes = 'class="table"'
     table_html = df.to_html(classes="table table-striped")
+
+    sleep(2)
 
     return {'plot_script': [scatter_script],
             'plot_div': [scatter_div],
