@@ -21,7 +21,7 @@ def find_most_similar_str(desired_filename, model_filenames):
     for i in range(1, len(lev_distances)):
         if lev_distances[i] < lev_distances[min_dist_i]:
             min_dist_i = i
-    return model_filenames[min_dist_i]
+    return model_filenames[min_dist_i], lev_distances[min_dist_i]
 
 def run_inference(job_id, csv_filename, exhauster, agregat):
     """Вынес сюда "настоящий" код"""
@@ -29,8 +29,16 @@ def run_inference(job_id, csv_filename, exhauster, agregat):
 
     ml_models_path = os.path.join(basedir, f'ml_models/{exhN}/')
     ml_model_filenames = os.listdir(ml_models_path)
-    ml_model_m1_filename = find_most_similar_str(exhauster+'__'+agregat+'__M1', ml_model_filenames)
-    ml_model_m3_filename = find_most_similar_str(exhauster+'__'+agregat+'__M3', ml_model_filenames)
+    ml_model_m1_filename, score1 = find_most_similar_str(exhauster+'__'+agregat+'__M1', ml_model_filenames)
+    ml_model_m3_filename, score3 = find_most_similar_str(exhauster+'__'+agregat+'__M3', ml_model_filenames)
+
+    print(exhauster+'__'+agregat, '::', ml_model_m1_filename, score1, '  ', ml_model_m3_filename, score3)
+
+    # If the models are in fact missing
+    if ml_model_m1_filename[-2:] != 'M1':
+        ml_model_m1_filename = None
+    if ml_model_m3_filename[-2:] != 'M3':
+        ml_model_m3_filename = None
 
     # ЭКСГАУТЕРx__АГРЕГАТ__Mx_15
     # ЭКСГАУТЕРx__АГРЕГАТ__Mx_30
@@ -44,13 +52,19 @@ def run_inference(job_id, csv_filename, exhauster, agregat):
     X_train = pd.read_csv(csv_filename, parse_dates=True)
     X_train = X_train.set_index("DT")
 
-    model_m1 = catboost.CatBoostClassifier()
-    model_m1.load_model(os.path.join(ml_models_path, ml_model_m1_filename))
-    proba_m1 = model_m1.predict_proba(X_train.values)
+    if ml_model_m1_filename:
+        model_m1 = catboost.CatBoostClassifier()
+        model_m1.load_model(os.path.join(ml_models_path, ml_model_m1_filename))
+        proba_m1 = model_m1.predict_proba(X_train.values)
+    else:
+        proba_m1 = [[1., 0.] for i in X_train.index]
 
-    model_m3 = catboost.CatBoostClassifier()
-    model_m3.load_model(os.path.join(ml_models_path, ml_model_m3_filename))
-    proba_m3 = model_m3.predict_proba(X_train.values)
+    if ml_model_m3_filename:
+        model_m3 = catboost.CatBoostClassifier()
+        model_m3.load_model(os.path.join(ml_models_path, ml_model_m3_filename))
+        proba_m3 = model_m3.predict_proba(X_train.values)
+    else:
+        proba_m3 = [[1., 0.] for i in X_train.index]
 
     plot_script, plot_div, tables = [], [], []
 
