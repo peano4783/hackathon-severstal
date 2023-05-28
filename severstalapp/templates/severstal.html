@@ -44,7 +44,7 @@ div {  padding-bottom: 2px;   }
       </div>
 
       <div class="row">
-        <label class="col-sm-2">Данные (.xlsx):</label>
+        <label class="col-sm-2">Данные (.csv):</label>
         <div class="col-sm-6">
             <input name="file" class="form-control" type="file"/>
         </div>
@@ -53,7 +53,7 @@ div {  padding-bottom: 2px;   }
       <div class="row">
         <label class="col-sm-2">Эксгаустер:</label>
         <div class="col-sm-6">
-            <input name="exhauster" id="exhauster" class="form-control" type="text" list="list_exhausters" value="" placeholder="" onchange="exhausterChange();"/>
+            <input name="exhauster" id="exhauster" class="form-control" type="text" list="list_exhausters" value="{{exhauster}}" placeholder="" onchange="exhausterChange();"/>
             <datalist id="list_exhausters">
                 <option>Y_ЭКСГАУСТЕР А/М №4</option>
                 <option>Y_ЭКСГАУСТЕР А/М №5</option>
@@ -76,7 +76,7 @@ div {  padding-bottom: 2px;   }
       <div class="row">
         <label class="col-sm-2">Агрегат:</label>
         <div class="col-sm-6">
-            <input name="agregat" id="agregat" class="form-control" type="text" value="" placeholder=""/>
+            <input name="agregat" id="agregat" class="form-control" type="text" value="{{agregat}}" placeholder=""/>
             <datalist id="list_Y_ЭКСГАУСТЕР А/М №9">
                 <option>ЗАПОРНАЯ АРМАТУРА ЭКСГАУСТЕРА №9</option>
                 <option>МАСЛОСТАНЦИЯ ЖИДКОЙ СМАЗКИ ЭКСГ. №9</option>
