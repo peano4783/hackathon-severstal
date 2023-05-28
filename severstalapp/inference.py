@@ -32,7 +32,7 @@ def run_inference(job_id, csv_filename, exhauster, agregat):
     ml_model_m1_filename, score1 = find_most_similar_str(exhauster+'__'+agregat+'__M1', ml_model_filenames)
     ml_model_m3_filename, score3 = find_most_similar_str(exhauster+'__'+agregat+'__M3', ml_model_filenames)
 
-    print(exhauster+'__'+agregat, '::', ml_model_m1_filename, score1, '  ', ml_model_m3_filename, score3)
+    # print(exhauster+'__'+agregat, '::', ml_model_m1_filename, score1, '  ', ml_model_m3_filename, score3)
 
     # If the models are in fact missing
     if ml_model_m1_filename[-2:] != 'M1':
