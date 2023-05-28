@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<style>
+div {  padding-bottom: 2px;   }
+.flashes li {
+    color: #fff;
+    display: block;
+    font-size: 1.2em;
+    font-weight: bold;
+    letter-spacing: 0.025em;
+    text-align: center;
+}
+</style>
+</head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/{{bokeh_version}}/bokeh.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/{{bokeh_version}}/bokeh-widgets.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/{{bokeh_version}}/bokeh-tables.js"></script>
+
+<body>
+
+	<div class="container" style="min-height:100% width:80%">
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	    {% for message in messages %}
+		  <div class="alert alert-warning alert-dismissible" role="alert">
+			{{message}}
+		  </div>
+		{% endfor %}
+	  {% endif %}
+	{% endwith %}
+    </div>
+
+
+    <div class="container">
+      <div class="row">
+        <label class="col-sm-8"><h2>{{title}}</h2></label>
+      </div>
+
+      <div class="row">
+        <label class="col-sm-8">Задача {{job_id}} выполняется.</label>
+      </div>
+
+      <div class="row">
+        <label class="col-sm-8"><a href="/result?job_id={{job_id}}">Перейти к результатам</a></label>
+      </div>
+    </div>
+
+</body>
+
+</html>
+
+
