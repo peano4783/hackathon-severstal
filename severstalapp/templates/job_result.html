@@ -57,14 +57,10 @@ div {  padding-bottom: 2px;   }
           {{ result.plot_script[i]|safe }}
         </div>
       </div>
-      {% endfor %}
-      {% endif %}
 
-      {% if 'table_html' in result %}
-      {% for t_html in result.table_html %}
       <div class="row">
         <div class="col-sm-8">
-            {{t_html|safe}}
+            {{result.table_html[i]|safe}}
         </div>
       </div>
       {% endfor %}

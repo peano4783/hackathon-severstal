@@ -24,7 +24,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'media')
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 app.config['CELERY']=dict(
-        broker_url='amqp://admin:???iko?????@31.13.134.173:5672/my_vhost',
+        broker_url='amqp://admin:p@31.13.134.173:5672/my_vhost',
         # result_backend='',
         task_ignore_result=True,
     )
