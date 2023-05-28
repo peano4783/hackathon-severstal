@@ -66,11 +66,12 @@ def run_inference(job_id, csv_filename, exhauster, agregat):
 
     # Visualization
     pointsize = 3
-    scatter = hv.Scatter(df_m1).opts(width=PLOT_WIDTH, height=PLOT_HEIGHT, xlabel=df_m1.columns[0], ylabel=df_m1.columns[1],
+    ylabel = 'Вероятность'
+    scatter = hv.Scatter(df_m1, label='M1').opts(width=PLOT_WIDTH, height=PLOT_HEIGHT, xlabel=df_m1.columns[0], ylabel=ylabel,
                                   size=pointsize, xrotation = 90,
                                   title=plot_title, tools=['hover'])
     scatter = scatter * hv.Curve(df_m1)
-    scatter = scatter * hv.Scatter(df_m3).opts(width=PLOT_WIDTH, height=PLOT_HEIGHT, xlabel=df_m3.columns[0], ylabel=df_m3.columns[1],
+    scatter = scatter * hv.Scatter(df_m3, label='M3').opts(width=PLOT_WIDTH, height=PLOT_HEIGHT, xlabel=df_m3.columns[0], ylabel=ylabel,
                                   size=pointsize, xrotation = 90,
                                   title=plot_title, tools=['hover'])
     scatter = scatter * hv.Curve(df_m3)
@@ -79,7 +80,7 @@ def run_inference(job_id, csv_filename, exhauster, agregat):
     plot_script.append(scatter_script)
     plot_div.append(scatter_div)
 
-    table_html = df_m.set_index('Время').to_html(classes="table table-striped")
+    table_html = df_m.to_html(classes="table table-striped")
     tables.append(table_html)
 
     # Here comes another table
